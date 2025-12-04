@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 babel = Babel()
 
+
 @babel.localeselector
 def get_locale() -> Optional[str]:
     # Return the `locale` value previously saved (e.g. from an URL parameter)

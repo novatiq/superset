@@ -27,10 +27,10 @@ from babel import Locale
 from flask import (
     abort,
     flash,
-    request,
     g,
     get_flashed_messages,
     redirect,
+    request,
     Response,
     session,
 )

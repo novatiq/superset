@@ -580,8 +580,11 @@ class SigalrmTimeout:
     def __enter__(self) -> None:
         try:
             if threading.current_thread() == threading.main_thread():
-                signal.signal(signal.SIGALRM, self.handle_timeout)
-                signal.alarm(self.seconds)
+                sig = getattr(signal, "SIGALRM", None)
+                alarm_fn = getattr(signal, "alarm", None)
+                if sig is not None and alarm_fn is not None:
+                    signal.signal(sig, self.handle_timeout)
+                    alarm_fn(self.seconds)
         except ValueError as ex:
             logger.warning("timeout can't be used in the current context")
             logger.exception(ex)
@@ -590,7 +593,9 @@ class SigalrmTimeout:
         self, type: Any, value: Any, traceback: TracebackType
     ) -> None:
         try:
-            signal.alarm(0)
+            alarm_fn = getattr(signal, "alarm", None)
+            if alarm_fn is not None:
+                alarm_fn(0)
         except ValueError as ex:
             logger.warning("timeout can't be used in the current context")
             logger.exception(ex)

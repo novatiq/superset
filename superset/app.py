@@ -19,11 +19,21 @@ import logging
 import os
 from typing import Optional
 
-from flask import Flask
+from flask import Flask, session
+from flask_babel import Babel
 
 from superset.initialization import SupersetAppInitializer
 
 logger = logging.getLogger(__name__)
+
+
+babel = Babel()
+
+
+@babel.localeselector
+def get_locale() -> Optional[str]:
+    # Return the `locale` value previously saved (e.g. from an URL parameter)
+    return session.get("locale")
 
 
 def create_app(superset_config_module: Optional[str] = None) -> Flask:

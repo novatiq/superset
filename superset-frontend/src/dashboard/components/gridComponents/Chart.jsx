@@ -507,7 +507,7 @@ const Chart = props => {
         exportXLSX={exportXLSX}
         exportFullCSV={exportFullCSV}
         exportFullXLSX={exportFullXLSX}
-        updateSliceName={props.updateSliceName}
+        updateSliceName={t(props.updateSliceName)}
         sliceName={t(props.sliceName)}
         supersetCanExplore={supersetCanExplore}
         supersetCanShare={supersetCanShare}

@@ -67,7 +67,44 @@ t('Important Notes');
 // TABLE COLUMN HEADERS (table visualization)
 // ============================================
 // Column headers for table charts
-t('Sales Amount');
-t('Order Date');
-t('Customer Name');
-t('Status');
+// Commercial NT
+t('This Year');
+t('This Quarter');
+t('This Month');
+t('This Week');
+t('Yesterday');
+t('MNO Revenue To Date');
+t('Year MNO Revenue');
+t('Quarter MNO Revenue');
+t('Month MNO Revenue');
+t('Weekly MNO Revenue');
+t('Daily MNO Revenue');
+t('Revenue');
+t('Impressions');
+t('Top Performing Audiences');
+t('Top performing campaigns');
+t('Revenue-Commercial');
+t('Impressions Commercial');
+t('Top Performing Campaigns');
+t('Commercial');
+t('Monthly Revenue');
+t('Revenue Monthly');
+t('Daily Revenue');
+t('License Fee Spend');
+t('Year MNO Spend');
+t('Quarter MNO Spend');
+t('Month MNO Spend');
+t('Week MNO Spend');
+t('Daily MNO Spend');
+t('Zenith Trends');
+t('Analytics');
+t('Revenue and impressions per campaign');
+
+// Commercial Monthly > revenue monthly table
+t('Gross Income');
+t('Gross Income Post Adjustment');
+t('Adjustment Amount');
+t('Gross Income Post Buy-side Admin Fee');
+t('Gross Income Post Buy-side Admin Fee Data Tax');
+t('Novatiq Revenue');
+t('Data Owner Revenue');

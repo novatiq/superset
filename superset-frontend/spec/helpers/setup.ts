@@ -17,10 +17,14 @@
  * under the License.
  */
 import './shim';
+import { configure } from '@superset-ui/core';
 // eslint-disable-next-line no-restricted-syntax -- whole React import is required for mocking React module in tests.
 import React from 'react';
 import { configure as configureTestingLibrary } from '@testing-library/react';
 import { matchers } from '@emotion/jest';
+
+// configure translation
+configure();
 
 configureTestingLibrary({
   testIdAttribute: 'data-test',

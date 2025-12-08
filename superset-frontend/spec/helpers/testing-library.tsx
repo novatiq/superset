@@ -25,7 +25,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import { ThemeProvider, supersetTheme, configure } from '@superset-ui/core';
+import { ThemeProvider, supersetTheme } from '@superset-ui/core';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { DndProvider } from 'react-dnd';
@@ -35,8 +35,6 @@ import { QueryParamProvider } from 'use-query-params';
 import { configureStore, Store } from '@reduxjs/toolkit';
 import { api } from 'src/hooks/apiResources/queryApi';
 import userEvent from '@testing-library/user-event';
-
-configure();
 
 type Options = Omit<RenderOptions, 'queries'> & {
   useRedux?: boolean;

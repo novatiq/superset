@@ -103,7 +103,6 @@ describe('ChartHolder', () => {
       useRouter: true,
       useDnd: true,
       useRedux: true,
-      useI18n: true,
       store,
     });
 

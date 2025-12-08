@@ -162,6 +162,7 @@ export default function transformProps(
     columnFormats,
     metricEntry?.d3format || yAxisFormat,
     currencyFormat,
+    metricName,
   );
 
   const headerFormatter =

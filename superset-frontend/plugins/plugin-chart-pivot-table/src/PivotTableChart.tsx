@@ -21,9 +21,11 @@ import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import {
   AdhocMetric,
   BinaryQueryObjectFilterClause,
+  CurrencyFormatter,
   DataRecordValue,
   FeatureFlag,
   getColumnLabel,
+  getNumberFormatter,
   getSelectedText,
   isAdhocColumn,
   isFeatureEnabled,
@@ -32,7 +34,6 @@ import {
   styled,
   t,
   useTheme,
-  getValueFormatter,
 } from '@superset-ui/core';
 import { aggregatorTemplates, PivotTable, sortAs } from './react-pivottable';
 import {
@@ -156,28 +157,16 @@ export default function PivotTableChart(props: PivotTableProps) {
     allowRenderHtml,
   } = props;
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlLocale = urlParams.get('locale') || undefined;
-  const currencySymbol = urlParams.get('currencySymbol') || undefined;
   const theme = useTheme();
   const defaultFormatter = useMemo(
     () =>
-      getValueFormatter(
-        metrics,
-        currencyFormats,
-        columnFormats,
-        valueFormat,
-        currencyFormat,
-      ),
-    [
-      metrics,
-      currencyFormats,
-      columnFormats,
-      valueFormat,
-      currencyFormat,
-      urlLocale,
-      currencySymbol,
-    ],
+      currencyFormat?.symbol
+        ? new CurrencyFormatter({
+            currency: currencyFormat,
+            d3Format: valueFormat,
+          })
+        : getNumberFormatter(valueFormat),
+    [valueFormat, currencyFormat],
   );
   const customFormatsArray = useMemo(
     () =>
@@ -201,26 +190,17 @@ export default function PivotTableChart(props: PivotTableProps) {
             [METRIC_KEY]: Object.fromEntries(
               customFormatsArray.map(([metric, d3Format, currency]) => [
                 metric,
-                getValueFormatter(
-                  metrics,
-                  currencyFormats,
-                  columnFormats,
-                  d3Format,
-                  currency,
-                ),
+                currency
+                  ? new CurrencyFormatter({
+                      currency,
+                      d3Format,
+                    })
+                  : getNumberFormatter(d3Format),
               ]),
             ),
           }
         : undefined,
-    [
-      metrics,
-      customFormatsArray,
-      hasCustomMetricFormatters,
-      currencyFormats,
-      columnFormats,
-      urlLocale,
-      currencySymbol,
-    ],
+    [customFormatsArray, hasCustomMetricFormatters],
   );
 
   const metricNames = useMemo(

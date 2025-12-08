@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useEffect, useState } from 'react';
+
 import { styled } from '@superset-ui/core';
 import cls from 'classnames';
 import Loader from 'src/assets/images/loading.gif';
@@ -61,29 +61,11 @@ export default function Loading({
   image,
   className,
 }: Props) {
-  const [loaderSrc, setLoaderSrc] = useState<string>(Loader);
-
-  useEffect(() => {
-    fetch('/superset/loader/', {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data?.src) {
-          setLoaderSrc(data.src);
-        }
-      })
-      .catch(() => {
-        // Silently fail, use default
-      });
-  }, []);
-
   return (
     <LoaderImg
       className={cls('loading', position, className)}
       alt="Loading..."
-      src={image || loaderSrc}
+      src={image || Loader}
       role="status"
       aria-live="polite"
       aria-label="Loading"

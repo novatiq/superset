@@ -24,15 +24,7 @@ import {
   isSavedMetric,
   QueryFormMetric,
   ValueFormatter,
-  NumberFormatter,
 } from '@superset-ui/core';
-import countryToCurrencyRaw from 'country-to-currency';
-
-const countryToCurrency = countryToCurrencyRaw as Record<string, string>;
-const getCurrencyForLocale = (locale: string): string => {
-  const region = new Intl.Locale(locale).maximize().region ?? 'US';
-  return countryToCurrency[region] ?? 'USD';
-};
 
 export const buildCustomFormatters = (
   metrics: QueryFormMetric | QueryFormMetric[] | undefined,
@@ -42,30 +34,27 @@ export const buildCustomFormatters = (
   currencyFormat: Currency | undefined,
 ) => {
   const metricsArray = ensureIsArray(metrics);
-  return metricsArray.reduce(
-    (acc, metric) => {
-      if (isSavedMetric(metric)) {
-        const actualD3Format = d3Format ?? savedColumnFormats[metric];
-        const actualCurrencyFormat = currencyFormat?.symbol
-          ? currencyFormat
-          : savedCurrencyFormats[metric];
-        return actualCurrencyFormat
-          ? {
-              ...acc,
-              [metric]: new CurrencyFormatter({
-                d3Format: actualD3Format,
-                currency: actualCurrencyFormat,
-              }),
-            }
-          : {
-              ...acc,
-              [metric]: getNumberFormatter(actualD3Format),
-            };
-      }
-      return acc;
-    },
-    {} as Record<string, ValueFormatter>,
-  );
+  return metricsArray.reduce((acc, metric) => {
+    if (isSavedMetric(metric)) {
+      const actualD3Format = d3Format ?? savedColumnFormats[metric];
+      const actualCurrencyFormat = currencyFormat?.symbol
+        ? currencyFormat
+        : savedCurrencyFormats[metric];
+      return actualCurrencyFormat
+        ? {
+            ...acc,
+            [metric]: new CurrencyFormatter({
+              d3Format: actualD3Format,
+              currency: actualCurrencyFormat,
+            }),
+          }
+        : {
+            ...acc,
+            [metric]: getNumberFormatter(actualD3Format),
+          };
+    }
+    return acc;
+  }, {});
 };
 
 export const getCustomFormatter = (
@@ -87,67 +76,24 @@ export const getValueFormatter = (
   d3Format: string | undefined,
   currencyFormat: Currency | undefined,
   key?: string,
-): ValueFormatter => {
-  const params = new URLSearchParams(window.location.search);
-  const hasLocaleParam = params.has('locale') && !!params.get('locale');
-  const hasSymbolParam =
-    params.has('currencySymbol') && !!params.get('currencySymbol');
-  const isEmbedding = hasLocaleParam || hasSymbolParam;
+) => {
+  const customFormatter = getCustomFormatter(
+    buildCustomFormatters(
+      metrics,
+      savedCurrencyFormats,
+      savedColumnFormats,
+      d3Format,
+      currencyFormat,
+    ),
+    metrics,
+    key,
+  );
 
-  if (!isEmbedding) {
-    const fmtD3 = d3Format ?? (key ? savedColumnFormats[key] : undefined);
-    const fmtCurrency =
-      (currencyFormat?.symbol ? currencyFormat : undefined) ??
-      (key ? savedCurrencyFormats[key] : undefined);
-    if (fmtCurrency?.symbol) {
-      return new CurrencyFormatter({ currency: fmtCurrency, d3Format: fmtD3 });
-    }
-    return getNumberFormatter(fmtD3);
+  if (customFormatter) {
+    return customFormatter;
   }
-
-  const urlLocale = params.get('locale') ?? 'en-US';
-  const currencySymbol = params.get('currencySymbol') ?? '';
-
-  if (d3Format?.includes('%')) {
-    return getNumberFormatter(d3Format);
+  if (currencyFormat?.symbol) {
+    return new CurrencyFormatter({ currency: currencyFormat, d3Format });
   }
-
-  try {
-    const currencyCode = getCurrencyForLocale(urlLocale);
-    const native = new Intl.NumberFormat(urlLocale || 'en-US', {
-      style: 'currency',
-      currency: currencyCode,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-    return new NumberFormatter({
-      id: `currency-${currencyCode}`,
-      formatFunc: (value: number) => {
-        // Use formatToParts to reliably locate the currency portion
-        // and replace it with the provided `currencySymbol` when present.
-        try {
-          const parts = native.formatToParts(value);
-          return parts
-            .map(part =>
-              part.type === 'currency' && currencySymbol
-                ? currencySymbol
-                : part.value,
-            )
-            .join('');
-        } catch (err) {
-          // Fallback to the full formatted string if formatToParts is unsupported
-          let formatted = native.format(value);
-          if (currencySymbol) {
-            // Best-effort replacement for environments without formatToParts
-            formatted = formatted.replace(/[\p{Sc}A-Z]{1,3}/gu, currencySymbol);
-          }
-          return formatted;
-        }
-      },
-      label: `Currency (${currencySymbol || currencyCode})`,
-      description: `Formats numbers as currency in ${currencySymbol || currencyCode}`,
-    });
-  } catch {
-    return getNumberFormatter(d3Format);
-  }
+  return getNumberFormatter(d3Format);
 };

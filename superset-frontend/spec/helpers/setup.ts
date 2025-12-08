@@ -21,6 +21,7 @@ import './shim';
 import React from 'react';
 import { configure as configureTestingLibrary } from '@testing-library/react';
 import { matchers } from '@emotion/jest';
+import fetchMock from 'fetch-mock';
 
 configureTestingLibrary({
   testIdAttribute: 'data-test',
@@ -31,3 +32,5 @@ expect.extend(matchers);
 
 // Allow JSX tests to have React import readily available
 global.React = React;
+
+fetchMock.get('/superset/loader/', { src: '' }, { overwriteRoutes: true });
